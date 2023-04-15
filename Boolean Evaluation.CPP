@@ -1,75 +1,98 @@
 #include <iostream>
 #include <string>
+
 using namespace std;
 
-bool evaluateBoolean(string str, int& index, bool& result);
-
-bool evaluateSubExpression(string str, int& index, bool& result) {
-    if (str[index] == '~') {
-        index++;
-        // Evaluate the negation of the next expression
-        bool negationResult;
-        evaluateBoolean(str, index, negationResult);
-        result = !negationResult;
-        return true;
-    } else if ((str[index] >= 'a' && str[index] <= 'z') || (str[index] >= 'A' && str[index] <= 'Z')) {
-        // Evaluate the literal
-        result = str[index] >= 'A' && str[index] <= 'Z';
-        index++;
-        return true;
+string conjunction(string p, string q) {
+    if (p == "T" && q == "T") {
+        return "T";
     } else {
-        // Return false to indicate that an error occurred
-        return false;
+        return "F";
     }
 }
 
-bool evaluateBoolean(string str, int& index, bool& result) {
-    if (!evaluateSubExpression(str, index, result)) {
-        return false;
+string disjunction(string p, string q) {
+    if (p == "T" || q == "T") {
+        return "T";
+    } else {
+        return "F";
     }
+}
 
-    while (index < str.length()) {
-        if (str[index] == '^') {
-            index++;
-            bool rightResult;
-            if (!evaluateSubExpression(str, index, rightResult)) {
-                return false;
-            }
-            result = result || rightResult;
-        } else if (str[index] == 'v') {
-            index++;
-            bool rightResult;
-            if (!evaluateSubExpression(str, index, rightResult)) {
-                return false;
-            }
-            result = result && rightResult;
-        } else if (str[index] == ')') {
-            index++;
-            return true;
-        } else {
-            return false;
-        }
+string implication(string p, string q) {
+    if (p == "T" && q == "F") {
+        return "F";
+    } else {
+        return "T";
     }
+}
 
-    return true;
+string biconditional(string p, string q) {
+    if (p == q) {
+        return "T";
+    } else {
+        return "F";
+    }
+}
+
+string exclusive_or(string p, string q) {
+    if ((p == "T" && q == "F") || (p == "F" && q == "T")) {
+        return "T";
+    } else {
+        return "F";
+    }
+}
+
+string negation(string p) {
+    if (p == "T") {
+        return "F";
+    } else {
+        return "T";
+    }
 }
 
 int main() {
+    string p, q;
+    char option;
+    cout << "Enter the truth value of p (F for False, T for True): ";
+    cin >> p;
+    cout << "Enter the truth value of q (F for False, T for True): ";
+    cin >> q;
+    cout << "Enter the corresponding number for the logical operator:\n";
+    cout << "1. Conjunction (^)\n2. Disjunction (v)\n3. Implication (->)\n4. Biconditional (<->)\n5. Exclusive or (+)\n6. Negation (~)\n";
+    cout << "Option: ";
+    cin >> option;
+
     string propositionalFormula;
-    cout << "Enter a propositional Formula" << endl;
-    getline(cin, propositionalFormula);
-
-    int index = 0;
-    bool result;
-    bool success = evaluateBoolean(propositionalFormula, index, result);
-
-    if (success) {
-        // Print the final result of the expression
-        cout << "Result: " << (result ? "true" : "false") << endl;
-    } else {
-        // Indicate that an error occurred
-        cout << "Error: Invalid propositional formula" << endl;
+    switch (option) {
+        case '1':
+            propositionalFormula = ::conjunction(p, q);
+            break;
+        case '2':
+            propositionalFormula = ::disjunction(p, q);
+            break;
+        case '3':
+            propositionalFormula = implication(p, q);
+            break;
+        case '4':
+            propositionalFormula = biconditional(p, q);
+            break;
+        case '5':
+            propositionalFormula = exclusive_or(p, q);
+            break;
+        case '6':
+            propositionalFormula = ::negation(p);
+            break;
+        default:
+            cout << "Invalid option. Please enter a number between 1 and 6.\n";
+            return 0;
     }
+
+    cout << "P: " << p << endl;
+    if (option != '6') {
+        cout << "Q: " << q << endl;
+    }
+    cout << "Expression: " << propositionalFormula << endl;
 
     return 0;
 }
